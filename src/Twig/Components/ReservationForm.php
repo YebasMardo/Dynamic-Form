@@ -6,6 +6,7 @@ use App\Form\ReservationType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
+use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\ComponentWithFormTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
@@ -18,5 +19,15 @@ final class ReservationForm extends AbstractController
     public function instantiateForm(): FormInterface
     {
         return $this->createForm(ReservationType::class);
+    }
+
+    #[LiveAction]
+    public function save(): void
+    {
+        $this->submitForm();
+
+        $reservation = $this->form->getData();
+
+        dd($reservation);
     }
 }
