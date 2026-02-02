@@ -5,7 +5,7 @@ namespace App\Form;
 use App\Enum\FlightClass;
 use App\Enum\SeatPreference;
 use App\Enum\TransportType;
-use App\Model\Reservation;
+use App\Entity\Reservation;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -33,14 +33,18 @@ class ReservationType extends AbstractType
                 'required' => false
             ])
             ->add('departureDate', DateType::class, [
-                'label' => 'Date de départ'
+                'label' => 'Date de départ',
+                'widget' => 'single_text',
+                'input' => 'datetime_immutable'
             ])
         ;
 
         $builder->addDependent('returnDate', 'isRoundTrip', function(DependentField $field, ?bool $isRoundTrip) {
             if($isRoundTrip) {
                 $field->add(DateType::class, [
-                    'label' => "Date d'arrivée"
+                    'label' => "Date d'arrivée",
+                    'widget' => 'single_text',
+                    'input' => 'datetime_immutable'
                 ]);
             }
         });

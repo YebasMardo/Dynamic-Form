@@ -2,7 +2,10 @@
 
 namespace App\Twig\Components;
 
+use App\Entity\Reservation;
 use App\Form\ReservationType;
+use App\Repository\ReservationRepository;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -16,9 +19,14 @@ final class ReservationForm extends AbstractController
     use ComponentWithFormTrait;
     use DefaultActionTrait;
 
+    public function __construct(
+        private ReservationRepository $reservationRepository,
+    ) {
+    }
+
     public function instantiateForm(): FormInterface
     {
-        return $this->createForm(ReservationType::class);
+        return $this->createForm(ReservationType::class, new Reservation());
     }
 
     #[LiveAction]
@@ -26,8 +34,16 @@ final class ReservationForm extends AbstractController
     {
         $this->submitForm();
 
-        $reservation = $this->form->getData();
+        if (!$this->form->isValid()) {
+            return;
+        }
 
-        dd($reservation);
+        /** @var Reservation $reservation */
+        $reservation = $this->form->getData();
+        $reservation->setUpdatedAt(new DateTimeImmutable());
+
+        $this->reservationRepository->save($reservation, flush: true);
+
+        $this->addFlash('success', 'Réservation créée avec succès!');
     }
 }
